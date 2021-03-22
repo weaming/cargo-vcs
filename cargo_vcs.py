@@ -12,6 +12,9 @@ def get_versions(name):
 
 
 def main():
+    # fix called by cargo
+    if 'vcs' == sys.argv[1]:
+        sys.argv[1:2] = []
 
     parser = argparse.ArgumentParser()
     parser.add_argument("name")
@@ -45,6 +48,7 @@ def main():
                     print('found', x.name, file=sys.stderr)
                     f = tar.extractfile(x)
                     print(f.read().decode())
+                    break
             else:
                 print('not found', fname, file=sys.stderr)
     finally:
