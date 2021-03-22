@@ -7,7 +7,7 @@ gh_repo = 'https://github.com/weaming/cargo-vcs'
 
 setup(
     name='cargo-vcs',  # Required
-    version='2.1',  # Required
+    version='2.2',  # Required
     description='Print the content of `.cargo_vcs_info.json` in the downloaded `.crate` file.',  # Required
     long_description=open('README.md').read().strip(),
     long_description_content_type="text/markdown",

@@ -28,6 +28,7 @@ def main():
     try:
         if not os.path.isfile(tf):
             versions = get_versions(name)
+            print('versions:', ', '.join(x['num'] for x in versions), file=sys.stderr)
             if args.version == 'latest':
                 version = versions[-1]
             else:
