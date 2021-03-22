@@ -38,7 +38,7 @@ def main():
 
             dl_url = 'https://crates.io' + version['dl_path']
 
-            print(dl_url)
+            print(dl_url, file=sys.stderr)
             with open(tf, 'wb') as f:
                 f.write(requests.get(dl_url).content)
 
