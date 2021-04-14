@@ -5,6 +5,7 @@ import os, sys
 import requests
 import tarfile
 import argparse
+from io import BytesIO
 
 
 def get_versions(name):
@@ -23,38 +24,31 @@ def main():
 
     name = args.name
     version = args.version
-    tf = f'{name}-{version}.tar'
 
-    try:
-        if not os.path.isfile(tf):
-            versions = get_versions(name)
-            print('versions:', ', '.join(x['num'] for x in versions), file=sys.stderr)
-            if args.version == 'latest':
-                version = versions[-1]
-            else:
-                for v in versions:
-                    if v['num'] == args.version:
-                        version = v
+    versions = get_versions(name)
+    print('versions:', ', '.join(x['num'] for x in versions), file=sys.stderr)
+    if args.version == 'latest':
+        version = versions[0]
+    else:
+        for v in versions:
+            if v['num'] == args.version:
+                version = v
 
-            dl_url = 'https://crates.io' + version['dl_path']
+    dl_url = 'https://crates.io' + version['dl_path']
 
-            print(dl_url, file=sys.stderr)
-            with open(tf, 'wb') as f:
-                f.write(requests.get(dl_url).content)
+    print(dl_url, file=sys.stderr)
+    tf = BytesIO(requests.get(dl_url).content)
 
-        fname = '.cargo_vcs_info.json'
-        with tarfile.open(tf, "r") as tar:
-            for x in tar.getmembers():
-                if fname in x.name:
-                    print('found', x.name, file=sys.stderr)
-                    f = tar.extractfile(x)
-                    print(f.read().decode())
-                    break
-            else:
-                print('not found', fname, file=sys.stderr)
-    finally:
-        if os.path.isfile(tf):
-            os.remove(tf)
+    fname = '.cargo_vcs_info.json'
+    with tarfile.open(fileobj=tf, mode='r') as tar:
+        for x in tar.getmembers():
+            if fname in x.name:
+                print('found', x.name, file=sys.stderr)
+                f = tar.extractfile(x)
+                print(f.read().decode())
+                break
+        else:
+            print('not found', fname, file=sys.stderr)
 
 
 if __name__ == "__main__":
